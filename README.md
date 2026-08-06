@@ -1,4 +1,4 @@
-# index.html
+<Jishaan>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -26,31 +26,32 @@
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
+  html, body {
     background: var(--bg);
     color: var(--text);
     font-family: var(--font-mono);
-    font-size: 12px;
-    line-height: 1.5;
-    overflow: hidden;
-    height: 100vh;
+    font-size: 11px;
+    line-height: 1.45;
+    overflow-x: hidden;
+    min-height: 100vh;
     width: 100vw;
   }
 
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
   ::-webkit-scrollbar-thumb:hover { background: var(--accent-dim); }
 
   #header {
-    height: 40px;
+    height: 36px;
     background: var(--bg-panel);
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
-    position: relative;
+    padding: 0 12px;
+    position: sticky;
+    top: 0;
     z-index: 1000;
     flex-shrink: 0;
   }
@@ -58,10 +59,10 @@
   #header .logo {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     color: var(--accent);
     font-weight: bold;
-    font-size: 13px;
+    font-size: 12px;
     letter-spacing: 1px;
   }
 
@@ -79,43 +80,46 @@
   #header .status {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 10px;
     color: var(--text-dim);
+    font-size: 10px;
   }
 
-  #header .status span { display: flex; align-items: center; gap: 6px; }
+  #header .status span { display: flex; align-items: center; gap: 4px; }
 
   .dot {
-    width: 7px;
-    height: 7px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     display: inline-block;
   }
-  .dot.live { background: var(--green); box-shadow: 0 0 6px var(--green); }
-  .dot.demo { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+  .dot.live { background: var(--green); box-shadow: 0 0 5px var(--green); }
+  .dot.demo { background: var(--yellow); box-shadow: 0 0 5px var(--yellow); }
 
-  #mode-toggle {
+  #mode-toggle, #add-widget-btn, #reset-btn {
     background: var(--bg);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 3px 10px;
+    padding: 2px 8px;
     cursor: pointer;
     font-family: inherit;
-    font-size: 11px;
+    font-size: 10px;
     border-radius: 3px;
     transition: all 0.2s;
   }
-  #mode-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  #mode-toggle:hover, #add-widget-btn:hover, #reset-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   #dashboard {
     position: relative;
     width: 100%;
-    height: calc(100vh - 40px);
-    overflow: auto;
+    min-height: calc(100vh - 36px);
+    overflow-y: auto;
+    overflow-x: hidden;
     background:
       linear-gradient(rgba(0,212,170,0.03) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0,212,170,0.03) 1px, transparent 1px);
     background-size: 20px 20px;
+    padding: 12px;
   }
 
   .widget {
@@ -126,8 +130,8 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    min-width: 240px;
-    min-height: 160px;
+    min-width: 220px;
+    min-height: 140px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     transition: box-shadow 0.2s, border-color 0.2s;
   }
@@ -141,13 +145,13 @@
   .widget:hover { border-color: var(--border-bright); }
 
   .widget-header {
-    height: 28px;
+    height: 26px;
     background: linear-gradient(90deg, var(--bg-panel), var(--bg-panel-hover));
     border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 10px;
+    padding: 0 8px;
     cursor: grab;
     user-select: none;
     flex-shrink: 0;
@@ -157,23 +161,23 @@
 
   .widget-title {
     color: var(--accent);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
     letter-spacing: 0.5px;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
   }
 
   .widget-title::before {
     content: '■';
-    font-size: 8px;
+    font-size: 7px;
     color: var(--accent-dim);
   }
 
   .widget-controls {
     display: flex;
-    gap: 6px;
+    gap: 4px;
   }
 
   .widget-btn {
@@ -182,7 +186,7 @@
     color: var(--text-dim);
     cursor: pointer;
     font-family: inherit;
-    font-size: 10px;
+    font-size: 9px;
     padding: 2px 4px;
     border-radius: 2px;
     transition: color 0.2s;
@@ -192,16 +196,17 @@
   .widget-body {
     flex: 1;
     overflow: auto;
-    padding: 8px;
+    padding: 6px;
     position: relative;
+    font-size: 10px;
   }
 
   .resize-handle {
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     cursor: se-resize;
     background: linear-gradient(135deg, transparent 50%, var(--border-bright) 50%);
     border-bottom-right-radius: 3px;
@@ -213,16 +218,16 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 11px;
+    font-size: 10px;
   }
 
   th {
     text-align: left;
-    padding: 4px 6px;
+    padding: 3px 5px;
     color: var(--text-dim);
     border-bottom: 1px solid var(--border);
     font-weight: normal;
-    font-size: 10px;
+    font-size: 9px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     position: sticky;
@@ -231,16 +236,17 @@
   }
 
   td {
-    padding: 5px 6px;
+    padding: 4px 5px;
     border-bottom: 1px solid rgba(31,31,46,0.5);
     color: var(--text);
+    font-size: 10px;
   }
 
   tr:hover td { background: rgba(0,212,170,0.05); }
 
   .up { color: var(--green); }
   .down { color: var(--red); }
-  .muted { color: var(--text-dim); }
+  .muted { color: var(--text-dim); font-size: 9px; }
 
   canvas.chart-canvas {
     width: 100%;
@@ -250,7 +256,7 @@
 
   .heatmap-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
     gap: 3px;
     height: 100%;
   }
@@ -260,9 +266,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 4px;
+    padding: 3px;
     border-radius: 2px;
-    font-size: 10px;
+    font-size: 9px;
     text-align: center;
     cursor: pointer;
     transition: transform 0.1s;
@@ -271,13 +277,13 @@
   }
 
   .heatmap-cell:hover { transform: scale(1.05); z-index: 2; }
-  .heatmap-cell .hm-symbol { font-weight: bold; font-size: 10px; margin-bottom: 2px; }
-  .heatmap-cell .hm-change { font-size: 9px; }
+  .heatmap-cell .hm-symbol { font-weight: bold; font-size: 9px; margin-bottom: 1px; }
+  .heatmap-cell .hm-change { font-size: 8px; }
 
   .clock-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
+    gap: 6px;
     height: 100%;
   }
 
@@ -285,7 +291,7 @@
     background: rgba(0,0,0,0.3);
     border: 1px solid var(--border);
     border-radius: 3px;
-    padding: 8px;
+    padding: 6px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -293,16 +299,16 @@
     text-align: center;
   }
 
-  .clock-city { font-size: 10px; color: var(--accent); margin-bottom: 4px; }
-  .clock-time { font-size: 18px; font-weight: bold; color: var(--text); }
-  .clock-status { font-size: 9px; margin-top: 4px; padding: 1px 6px; border-radius: 2px; }
+  .clock-city { font-size: 9px; color: var(--accent); margin-bottom: 3px; }
+  .clock-time { font-size: 16px; font-weight: bold; color: var(--text); }
+  .clock-status { font-size: 8px; margin-top: 3px; padding: 1px 5px; border-radius: 2px; }
   .clock-status.open { background: rgba(0,212,170,0.15); color: var(--green); }
   .clock-status.closed { background: rgba(255,85,85,0.15); color: var(--red); }
   .clock-status.pre { background: rgba(240,173,78,0.15); color: var(--yellow); }
 
   .indices-row {
     display: flex;
-    gap: 12px;
+    gap: 8px;
     flex-wrap: wrap;
   }
 
@@ -310,47 +316,47 @@
     background: rgba(0,0,0,0.3);
     border: 1px solid var(--border);
     border-radius: 3px;
-    padding: 6px 10px;
-    min-width: 120px;
+    padding: 5px 8px;
+    min-width: 100px;
   }
 
-  .index-name { font-size: 10px; color: var(--text-dim); margin-bottom: 2px; }
-  .index-value { font-size: 14px; font-weight: bold; }
-  .index-change { font-size: 10px; margin-top: 2px; }
+  .index-name { font-size: 9px; color: var(--text-dim); margin-bottom: 1px; }
+  .index-value { font-size: 12px; font-weight: bold; }
+  .index-change { font-size: 9px; margin-top: 1px; }
 
   .metal-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px;
+    padding: 6px;
     background: rgba(0,0,0,0.2);
     border: 1px solid var(--border);
     border-radius: 3px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
   }
 
   .metal-info { display: flex; flex-direction: column; }
-  .metal-name { font-size: 11px; color: var(--text-dim); }
-  .metal-price { font-size: 14px; font-weight: bold; color: var(--text); }
-  .metal-change { font-size: 10px; }
+  .metal-name { font-size: 10px; color: var(--text-dim); }
+  .metal-price { font-size: 13px; font-weight: bold; color: var(--text); }
+  .metal-change { font-size: 9px; }
 
   .sparkline {
-    width: 60px;
-    height: 24px;
+    width: 50px;
+    height: 20px;
   }
 
   #tooltip {
     position: fixed;
     background: var(--bg-panel);
     border: 1px solid var(--accent);
-    padding: 6px 10px;
+    padding: 5px 8px;
     border-radius: 3px;
-    font-size: 11px;
+    font-size: 10px;
     pointer-events: none;
     z-index: 10000;
     display: none;
     box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-    max-width: 200px;
+    max-width: 180px;
   }
 
   #loading {
@@ -362,14 +368,14 @@
     align-items: center;
     justify-content: center;
     z-index: 20000;
-    gap: 16px;
+    gap: 14px;
   }
 
   #loading.hidden { display: none; }
 
   .loader-text {
     color: var(--accent);
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 2px;
     animation: blink 1s infinite;
   }
@@ -377,7 +383,7 @@
   @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
   .loader-bar {
-    width: 200px;
+    width: 180px;
     height: 2px;
     background: var(--border);
     border-radius: 1px;
@@ -395,33 +401,35 @@
 
   #add-menu {
     position: fixed;
-    top: 40px;
-    right: 10px;
+    top: 36px;
+    right: 8px;
     background: var(--bg-panel);
     border: 1px solid var(--border);
     border-radius: 4px;
-    padding: 8px;
+    padding: 6px;
     z-index: 10001;
     display: none;
-    min-width: 180px;
+    min-width: 160px;
     box-shadow: 0 8px 30px rgba(0,0,0,0.8);
   }
 
   #add-menu.show { display: block; }
 
   .menu-item {
-    padding: 6px 10px;
+    padding: 5px 8px;
     cursor: pointer;
     border-radius: 2px;
-    font-size: 11px;
+    font-size: 10px;
     color: var(--text);
     transition: background 0.15s;
   }
   .menu-item:hover { background: var(--accent-glow); color: var(--accent); }
 
   @media (max-width: 768px) {
-    .widget { position: relative !important; width: 100% !important; left: 0 !important; top: auto !important; margin-bottom: 8px; }
-    #dashboard { height: auto; overflow: visible; }
+    .widget { position: relative !important; width: 100% !important; left: 0 !important; top: auto !important; margin-bottom: 8px; height: auto !important; min-height: 180px; }
+    #dashboard { height: auto; overflow: visible; display: flex; flex-direction: column; }
+    .resize-handle { display: none; }
+    .widget-header { cursor: default; }
   }
 </style>
 </head>
@@ -438,8 +446,8 @@
     <span id="conn-status"><span class="dot demo" id="status-dot"></span> <span id="status-text">DEMO MODE</span></span>
     <span id="clock">--:--:--</span>
     <button id="mode-toggle" onclick="toggleMode()">SWITCH TO LIVE</button>
-    <button id="add-widget-btn" class="widget-btn" style="border:1px solid var(--border); padding:3px 10px;" onclick="toggleAddMenu()">+ WIDGET</button>
-    <button class="widget-btn" style="border:1px solid var(--border); padding:3px 10px;" onclick="resetLayout()">RESET</button>
+    <button id="add-widget-btn" onclick="toggleAddMenu()">+ WIDGET</button>
+    <button id="reset-btn" onclick="resetLayout()">RESET</button>
   </div>
 </div>
 
@@ -463,13 +471,13 @@
   const CONFIG = {
     gridSize: 20,
     defaultWidgets: [
-      { type: 'indianTopVolume', x: 20, y: 20, w: 340, h: 320 },
-      { type: 'indianTopGainers', x: 380, y: 20, w: 340, h: 320 },
-      { type: 'globalIndices', x: 740, y: 20, w: 480, h: 160 },
-      { type: 'sectorHeatmap', x: 20, y: 360, w: 500, h: 280 },
-      { type: 'aaplChart', x: 540, y: 200, w: 680, h: 440 },
-      { type: 'preciousMetals', x: 20, y: 660, w: 340, h: 200 },
-      { type: 'worldClocks', x: 380, y: 660, w: 340, h: 200 }
+      { type: 'indianTopVolume', x: 12, y: 12, w: 320, h: 280 },
+      { type: 'indianTopGainers', x: 348, y: 12, w: 320, h: 280 },
+      { type: 'globalIndices', x: 680, y: 12, w: 440, h: 140 },
+      { type: 'sectorHeatmap', x: 12, y: 304, w: 460, h: 240 },
+      { type: 'aaplChart', x: 484, y: 164, w: 636, h: 380 },
+      { type: 'preciousMetals', x: 12, y: 556, w: 320, h: 180 },
+      { type: 'worldClocks', x: 348, y: 556, w: 320, h: 180 }
     ],
     refreshInterval: 3000,
     demoMode: true
@@ -651,7 +659,7 @@
         const intensity = Math.min(Math.abs(d.change) / 3, 1);
         const bg = d.change >= 0 ? `rgba(0, ${Math.floor(212*intensity)}, ${Math.floor(170*intensity)}, ${0.15 + intensity*0.25})` : `rgba(${Math.floor(255*intensity)}, ${Math.floor(85*intensity)}, ${Math.floor(85*intensity)}, ${0.15 + intensity*0.25})`;
         const sign = d.change >= 0 ? '+' : '';
-        html += `<div class="heatmap-cell" style="background:${bg}; border: 1px solid ${d.change>=0?'rgba(0,212,170,0.3)':'rgba(255,85,85,0.3)'}" title="${d.stocks.join(', ')}"><div class="hm-symbol">${d.symbol}</div><div class="hm-change ${d.change>=0?'up':'down'}">${sign}${d.change.toFixed(2)}%</div></div>`;
+        html += `<div class="heatmap-cell" style="background:${bg}; border: 1px solid ${d.change>=0?'rgba(0,212,170,0.3)':'rgba(255,85,85,0.3)'}"><div class="hm-symbol">${d.symbol}</div><div class="hm-change ${d.change>=0?'up':'down'}">${sign}${d.change.toFixed(2)}%</div></div>`;
       });
       html += '</div>';
       widget.body.innerHTML = html;
@@ -707,7 +715,7 @@
 
     const data = DataAdapter.generateAAPLData();
     const w = rect.width, h = rect.height;
-    const pad = { top: 30, right: 50, bottom: 30, left: 10 };
+    const pad = { top: 28, right: 45, bottom: 28, left: 8 };
     const cw = w - pad.left - pad.right;
     const ch = h - pad.top - pad.bottom;
 
@@ -726,9 +734,9 @@
       ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
       const price = maxP - (range / 4) * i;
       ctx.fillStyle = '#6e7681';
-      ctx.font = '9px monospace';
+      ctx.font = '8px monospace';
       ctx.textAlign = 'right';
-      ctx.fillText('$' + price.toFixed(2), w - 5, y + 3);
+      ctx.fillText('$' + price.toFixed(2), w - 4, y + 3);
     }
 
     const barW = cw / data.length * 0.7;
@@ -752,7 +760,7 @@
     });
 
     const maxVol = Math.max(...data.map(d => d.volume));
-    const volH = 40;
+    const volH = 36;
     data.forEach((d, i) => {
       const x = pad.left + i * spacing + spacing * 0.15;
       const vh = (d.volume / maxVol) * volH;
@@ -762,12 +770,12 @@
     });
 
     ctx.fillStyle = '#00d4aa';
-    ctx.font = 'bold 11px monospace';
+    ctx.font = 'bold 10px monospace';
     ctx.textAlign = 'left';
-    ctx.fillText('AAPL — 60 Session Candlestick', pad.left, 16);
+    ctx.fillText('AAPL — 60 Session Candlestick', pad.left, 14);
     ctx.fillStyle = '#6e7681';
-    ctx.font = '9px monospace';
-    ctx.fillText('Volume overlay | Demo Data', pad.left, 28);
+    ctx.font = '8px monospace';
+    ctx.fillText('Volume overlay | Demo Data', pad.left, 24);
 
     canvas.onmousemove = (e) => {
       const r = canvas.getBoundingClientRect();
@@ -941,9 +949,9 @@
 
   function addWidget(type) {
     const existing = widgets.filter(w => w.type === type).length;
-    const x = 20 + existing * 30;
-    const y = 20 + existing * 30;
-    const defaults = { indianTopVolume: [340,320], indianTopGainers: [340,320], globalIndices: [480,160], sectorHeatmap: [500,280], aaplChart: [680,440], preciousMetals: [340,200], worldClocks: [340,200] };
+    const x = 12 + existing * 24;
+    const y = 12 + existing * 24;
+    const defaults = { indianTopVolume: [320,280], indianTopGainers: [320,280], globalIndices: [440,140], sectorHeatmap: [460,240], aaplChart: [636,380], preciousMetals: [320,180], worldClocks: [320,180] };
     const [w, h] = defaults[type] || [300, 200];
     createWidget(type, x, y, w, h);
     saveLayout();
