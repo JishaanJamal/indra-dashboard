@@ -1,3 +1,4 @@
+<Jamal Ahmed>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -514,7 +515,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-conten
+    t: center;
     z-index: 20000;
     gap: 14px;
   }
@@ -687,8 +689,7 @@
   <div class="menu-item" onclick="addWidget('globalIndices')">Global Indices</div>
   <div class="menu-item" onclick="addWidget('sectorHeatmap')">Sector Heatmap</div>
   <div class="menu-item" onclick="addWidget('aaplChart')">AAPL 60-Session</div>
-  <di
-  v class="menu-item" onclick="addWidget('preciousMetals')">Precious Metals</div>
+  <div class="menu-item" onclick="addWidget('preciousMetals')">Precious Metals</div>
   <div class="menu-item" onclick="addWidget('worldClocks')">World Clocks</div>
   <div class="menu-item" onclick="addWidget('technicalAnalysis')">Technical Analysis</div>
   <div class="menu-item" onclick="addWidget('nifty15m')">NIFTY 15-Min Chart</div>
@@ -853,7 +854,8 @@
       { name: 'Silver', symbol: 'XAG', price: 28.45, change: -0.56 },
       { name: 'Platinum', symbol: 'XPT', price: 978.30, change: 0.12 },
       { name: 'Palladium', symbol: 'XPD', price: 1023.40, change: -1.23 },
-      { name: 'Copper', symbol: 'COP', price: 4.56, change: 0.78 }
+      { name: 'Copper', symbol: '
+      COP', price: 4.56, change: 0.78 }
     ],
 
     generateAAPLData() {
@@ -1114,8 +1116,7 @@
       else { score -= 1; signals.push('Below SMA20'); }
 
       // EMA9 vs SMA20
-      if 
-      (ema9Latest > sma20Latest) { score += 1; signals.push('EMA9 > SMA20'); }
+      if (ema9Latest > sma20Latest) { score += 1; signals.push('EMA9 > SMA20'); }
       else { score -= 1; signals.push('EMA9 < SMA20'); }
 
       // Recent candle
@@ -1166,7 +1167,8 @@
       if (indianQuotes) {
         liveDataCache.indian = indianQuotes.map(q => ({
           symbol: q.symbol.replace('.NS', ''),
-          name: q.shortName || q.longName || q.symbol,
+          name: q.shortName || q.lon
+          gName || q.symbol,
           price: q.regularMarketPrice || q.price || 0,
           change: q.regularMarketChangePercent || 0,
           volume: q.regularMarketVolume || 0
@@ -1396,7 +1398,8 @@
       // VWAP
       const vwapDiff = ((latest.close - analysis.vwap) / analysis.vwap * 100);
       const vwapColor = vwapDiff > 0 ? 'var(--green)' : 'var(--red)';
-      html += `<div class="ta-card"><div class="ta-label">VWAP</div><div class="ta-value" style="color:${vwapColor}">${analysis.vwap.toFixed(2)}</div><div class="ta-signal ${vwapDiff > 0 ? 'buy' : 'sell'}">${vwapDiff > 0 ? 'ABOVE' : 'BELOW'} VWAP</div></div>`;
+      html += `<div class="ta-car
+      d"><div class="ta-label">VWAP</div><div class="ta-value" style="color:${vwapColor}">${analysis.vwap.toFixed(2)}</div><div class="ta-signal ${vwapDiff > 0 ? 'buy' : 'sell'}">${vwapDiff > 0 ? 'ABOVE' : 'BELOW'} VWAP</div></div>`;
 
       // SMA20
       const smaDiff = ((latest.close - analysis.sma20) / analysis.sma20 * 100);
@@ -1438,8 +1441,7 @@
     ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
 
     let data, title, subtitle;
-    if (type =
-    == 'aapl') {
+    if (type === 'aapl') {
       data = technicalData.aapl && dataMode === 'live' ? technicalData.aapl : DataAdapter.generateAAPLData();
       title = 'AAPL — Daily Candlestick';
       subtitle = dataMode === 'live' ? 'Live Yahoo Finance | 3 Months' : 'Demo Data | 60 Sessions';
@@ -1691,7 +1693,8 @@
       id, type, el,
       header: el.querySelector('.widget-header'),
       body: el.querySelector('.widget-body'),
-      handle: el.querySelector('.resize-handle'),
+      handl
+      e: el.querySelector('.resize-handle'),
       x, y, w, h
     };
 
@@ -1919,6 +1922,134 @@
     init();
   }
 
+})();
+</script>
+
+<!-- NIFTY 50 Search & Focus Mode -->
+<script>
+(function() {
+  // Create search container
+  const searchContainer = document.createElement('div');
+  searchContainer.style.cssText = 'display:flex;align-items:center;gap:6px;';
+
+  // Search input
+  const searchBox = document.createElement('input');
+  searchBox.type = 'text';
+  searchBox.placeholder = 'Search...';
+  searchBox.id = 'nifty-search';
+  searchBox.style.cssText = 'background:#0a0a0f;border:1px solid #1f1f2e;color:#00d4aa;padding:3px 8px;font-family:monospace;font-size:10px;border-radius:3px;width:120px;outline:none;transition:border-color 0.2s;';
+  searchBox.onfocus = () => searchBox.style.borderColor = '#00d4aa';
+  searchBox.onblur = () => { if(!searchBox.value) searchBox.style.borderColor = '#1f1f2e'; };
+
+  // NIFTY 50 Focus Button
+  const focusBtn = document.createElement('button');
+  focusBtn.textContent = 'NIFTY 50';
+  focusBtn.id = 'nifty-focus-btn';
+  focusBtn.style.cssText = 'background:#0a0a0f;border:1px solid #1f1f2e;color:#00d4aa;padding:2px 8px;font-family:monospace;font-size:10px;border-radius:3px;cursor:pointer;transition:all 0.2s;white-space:nowrap;';
+  let focused = false;
+
+  focusBtn.onclick = () => {
+    focused = !focused;
+    if (focused) {
+      focusBtn.style.borderColor = '#00d4aa';
+      focusBtn.style.background = 'rgba(0,212,170,0.15)';
+      focusBtn.style.color = '#00d4aa';
+      searchBox.value = 'nifty';
+      searchBox.style.borderColor = '#00d4aa';
+      filterWidgets('nifty');
+    } else {
+      focusBtn.style.borderColor = '#1f1f2e';
+      focusBtn.style.background = '#0a0a0f';
+      focusBtn.style.color = '#00d4aa';
+      searchBox.value = '';
+      searchBox.style.borderColor = '#1f1f2e';
+      filterWidgets('');
+    }
+  };
+
+  // Search function
+  function filterWidgets(term) {
+    term = term.toLowerCase().trim();
+    const allWidgets = document.querySelectorAll('.widget');
+    let matchCount = 0;
+
+    allWidgets.forEach(w => {
+      const text = w.textContent.toLowerCase();
+      const title = w.querySelector('.widget-title')?.textContent.toLowerCase() || '';
+
+      // Check if widget is NIFTY-related
+      const isNifty = text.includes('nifty') || text.includes('^nsei') || text.includes('technical analysis') || 
+                      title.includes('nifty') || title.includes('technical') || title.includes('sentiment') ||
+                      title.includes('global indices');
+
+      // Check if widget matches search term
+      const isMatch = !term || text.includes(term) || title.includes(term) || 
+                      (term === 'nifty' && isNifty) || 
+                      (term === 'nifty 50' && isNifty) ||
+                      (term === 'index' && title.includes('indices')) ||
+                      (term === 'indices' && title.includes('indices'));
+
+      if (term && !isMatch) {
+        w.style.opacity = '0.08';
+        w.style.pointerEvents = 'none';
+        w.style.transition = 'opacity 0.3s';
+      } else {
+        w.style.opacity = '1';
+        w.style.pointerEvents = 'auto';
+        w.style.transition = 'opacity 0.3s';
+        matchCount++;
+      }
+    });
+
+    // Highlight banner when NIFTY is searched
+    const banner = document.getElementById('sentiment-banner');
+    if (banner) {
+      if (term.includes('nifty')) {
+        banner.style.borderBottom = '1px solid #00d4aa';
+        banner.style.boxShadow = '0 0 15px rgba(0,212,170,0.15)';
+      } else {
+        banner.style.borderBottom = '1px solid var(--border)';
+        banner.style.boxShadow = 'none';
+      }
+    }
+  }
+
+  searchBox.addEventListener('input', (e) => {
+    const val = e.target.value;
+    if (!val) {
+      focused = false;
+      focusBtn.style.borderColor = '#1f1f2e';
+      focusBtn.style.background = '#0a0a0f';
+    }
+    filterWidgets(val);
+  });
+
+  searchBox.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      searchBox.value = '';
+      focused = false;
+      focusBtn.style.borderColor = '#1f1f2e';
+      focusBtn.style.background = '#0a0a0f';
+      filterWidgets('');
+    }
+  });
+
+  searchContainer.appendChild(searchBox);
+  searchContainer.appendChild(focusBtn);
+
+  // Insert into header
+  const headerStatus = document.querySelector('#header .status');
+  if (headerStatus) {
+    headerStatus.insertBefore(searchContainer, headerStatus.children[2]);
+  }
+
+  // Keyboard shortcut: Ctrl+K or Cmd+K to focus search
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+      e.preventDefault();
+      searchBox.focus();
+    }
+  });
 })();
 </script>
 </body>
