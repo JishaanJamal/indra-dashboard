@@ -1,1 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jamal Ahmed — INDRA Terminal</title>
+<style>
+:root{--bg:#0a0a0f;--panel:#111118;--border:#1f1f2e;--text:#c9d1d9;--dim:#6e7681;--green:#00d4aa;--red:#ff5555;--yellow:#f0ad4e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:monospace;font-size:11px;min-height:100vh;overflow-y:auto;overflow-x:hidden}
+#header{height:36px;background:var(--panel);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 12px;position:sticky;top:0;z-index:1000}
+.logo{color:var(--green);font-weight:bold;font-size:12px}
+.status{display:flex;align-items:center;gap:8px;color:var(--dim);font-size:10px}
+#search-box{background:#0a0a0f;border:1px solid var(--border);color:var(--green);padding:2px 6px;font-family:inherit;font-size:10px;border-radius:3px;width:100px;outline:none}
+#nifty-btn{background:#0a0a0f;border:1px solid var(--border);color:var(--green);padding:2px 8px;cursor:pointer;font-family:inherit;font-size:10px;border-radius:3px}
+#sentiment{height:24px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:10px;border-bottom:1px solid var(--border);background:rgba(0,212,170,0.05);color:var(--yellow)}
+#dashboard{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px;padding:10px;max-width:1400px;margin:0 auto}
+.widget{background:var(--panel);border:1px solid var(--border);border-radius:4px;overflow:hidden;min-height:200px;display:flex;flex-direction:column}
+.widget-header{height:24px;background:linear-gradient(90deg,var(--panel),#161620);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 8px;font-size:10px;color:var(--green);font-weight:bold}
+.widget-body{flex:1;overflow:auto;padding:6px;font-size:10px}
+table{width:100%;border-collapse:collapse;font-size:10px}
+th{text-align:left;padding:3px 5px;color:var(--dim);border-bottom:1px solid var(--border);font-size:9px;text-transform:uppercase;position:sticky;top:0;background:var(--panel)}
+td{padding:3px 5px;border-bottom:1px solid rgba(31,31,46,0.5)}
+.up{color:var(--green)}.down{color:var(--red)}.muted{color:var(--dim);font-size:9px}
+.heat{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+.heat-cell{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:6px;border-radius:2px;font-size:9px;text-align:center;background:rgba(0,0,0,0.2);border:1px solid var(--border)}
+.clocks{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+.clock{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:3px;padding:6px;text-align:center}
+.clock-city{font-size:9px;color:var(--green)}.clock-time{font-size:15px;font-weight:bold}
+.clock-status{font-size:8px;margin-top:2px;padding:1px 5px;border-radius:2px;display:inline-block}
+.open{background:rgba(0,212,170,0.15);color:var(--green)}.closed{background:rgba(255,85,85,0.15);color:var(--red)}
+.indices{display:flex;gap:6px;flex-wrap:wrap}
+.pill{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:3px;padding:4px 8px;min-width:90px}
+.pill-name{font-size:9px;color:var(--dim)}.pill-val{font-size:12px;font-weight:bold}.pill-chg{font-size:9px}
+.metal{display:flex;align-items:center;justify-content:space-between;padding:5px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:3px;margin-bottom:4px}
+canvas{display:block;width:100%;height:180px}
+#tooltip{position:fixed;background:var(--panel);border:1px solid var(--green);padding:5px 8px;border-radius:3px;font-size:10px;pointer-events:none;z-index:10000;display:none}
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:99999;color:var(--green);font-size:12px;letter-spacing:2px}
+#loading.hidden{display:none}
+</style>
+</head>
+<body>
 
+<div id="loading">INITIALIZING...</div>
+
+<div id="header">
+  <div class="logo">JAMAL AHMED — INDRA TERMINAL</div>
+  <div class="status">
+    <span id="clock">--:--:--</span>
+    <input type="text" id="search-box" placeholder="Search..." oninput="filterWidgets(this.value)">
+    <button id="nifty-btn" onclick="toggleNifty()">NIFTY 50</button>
+    <button onclick="toggleAddMenu()" style="background:#0a0a0f;border:1px solid var(--border);color:var(--text);padding:2px 6px;font-family:inherit;font-size:10px;border-radius:3px;cursor:pointer">+</button>
+    <button onclick="resetLayout()" style="background:#0a0a0f;border:1px solid var(--border);color:var(--text);padding:2px 6px;font-family:inherit;font-size:10px;border-radius:3px;cursor:pointer">RESET</button>
+  </div>
+</div>
+
+<div id="sentiment" class="neutral">
+  <span>NIFTY: <b id="s-nifty">22,534.50</b></span>
+  <span>BIAS: <b id="s-bias">NEUTRAL</b></span>
+  <span>RSI: <b>--</b></span>
+</div>
+
+<div id="dashboard">
+
+  <!-- Widget 1: Indian Top Volume -->
+  <div class="widget" data-type="volume">
+    <div class="widget-header">INDIAN TOP VOLUME</div>
+    <div class="widget-body" id="w-volume">
+      <table><thead><tr><th>Sym</th><th>Price</th><th>Vol</th><th>Chg%</th></tr></thead><tbody>
+        <tr><td><b>SBIN</b><br><span class="muted">SBI</span></td><td>₹568.12</td><td>8.92M</td><td class="up">+1.24%</td></tr>
+        <tr><td><b>ITC</b><br><span class="muted">ITC Ltd</span></td><td>₹424.10</td><td>6.54M</td><td class="down">-0.32%</td></tr>
+        <tr><td><b>ICICIBANK</b><br><span class="muted">ICICI Bank</span></td><td>₹946.80</td><td>5.67M</td><td class="up">+0.87%</td></tr>
+        <tr><td><b>RELIANCE</b><br><span class="muted">Reliance</span></td><td>₹2,458.90</td><td>4.52M</td><td class="up">+0.45%</td></tr>
+        <tr><td><b>HDFCBANK</b><br><span class="muted">HDFC Bank</span></td><td>₹1,425.30</td><td>3.89M</td><td class="up">+0.12%</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <!-- Widget 2: Indian Top Gainers -->
+  <div class="widget" data-type="gainers">
+    <div class="widget-header">INDIAN TOP GAINERS</div>
+    <div class="widget-body" id="w-gainers">
+      <table><thead><tr><th>Sym</th><th>Price</th><th>Chg%</th><th>Vol</th></tr></thead><tbody>
+        <tr><td><b>LT</b><br><span class="muted">L&T</span></td><td>₹2,348.20</td><td class="up">+3.45%</td><td>0.98M</td></tr>
+        <tr><td><b>MARUTI</b><br><span class="muted">Maruti Suzuki</span></td><td>₹9,890.50</td><td class="up">+2.87%</td><td>0.56M</td></tr>
+        <tr><td><b>TCS</b><br><span class="muted">Tata Consultancy</span></td><td>₹3,895.10</td><td class="up">+2.12%</td><td>1.23M</td></tr>
+        <tr><td><b>INFY</b><br><span class="muted">Infosys</span></td><td>₹1,460.80</td><td class="up">+1.98%</td><td>2.10M</td></tr>
+        <tr><td><b>HCLTECH</b><br><span class="muted">HCL Tech</span></td><td>₹1,238.40</td><td class="up">+1.76%</td><td>0.89M</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <!-- Widget 3: Global Indices -->
+  <div class="widget" data-type="indices">
+    <div class="widget-header">GLOBAL INDICES</div>
+    <div class="widget-body" id="w-indices">
+      <div class="indices">
+        <div class="pill"><div class="pill-name">NIFTY 50</div><div class="pill-val">22,534.50</div><div class="pill-chg up">+0.45%</div></div>
+        <div class="pill"><div class="pill-name">SENSEX</div><div class="pill-val">74,123.80</div><div class="pill-chg up">+0.38%</div></div>
+        <div class="pill"><div class="pill-name">S&P 500</div><div class="pill-val">5,566.20</div><div class="pill-chg down">-0.12%</div></div>
+        <div class="pill"><div class="pill-name">NASDAQ</div><div class="pill-val">17,890.40</div><div class="pill-chg up">+0.67%</div></div>
+        <div class="pill"><div class="pill-name">DOW</div><div class="pill-val">41,123.80</div><div class="pill-chg down">-0.05%</div></div>
+        <div class="pill"><div class="pill-name">NIKKEI</div><div class="pill-val">38,456.70</div><div class="pill-chg down">-0.34%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Widget 4: Sector Heatmap -->
+  <div class="widget" data-type="heatmap">
+    <div class="widget-header">SECTOR HEATMAP</div>
+    <div class="widget-body" id="w-heatmap">
+      <div class="heat">
+        <div class="heat-cell" style="background:rgba(0,212,170,0.25);border-color:rgba(0,212,170,0.3)"><b>AI</b><span class="up">+2.34%</span></div>
+        <div class="heat-cell" style="background:rgba(255,85,85,0.15);border-color:rgba(255,85,85,0.3)"><b>SOL</b><span class="down">-1.23%</span></div>
+        <div class="heat-cell" style="background:rgba(0,212,170,0.15);border-color:rgba(0,212,170,0.3)"><b>EV</b><span class="up">+0.87%</span></div>
+        <div class="heat-cell" style="background:rgba(0,212,170,0.10);border-color:rgba(0,212,170,0.3)"><b>BNK</b><span class="up">+0.45%</span></div>
+        <div class="heat-cell" style="background:rgba(255,85,85,0.20);border-color:rgba(255,85,85,0.3)"><b>FIN</b><span class="down">-0.67%</span></div>
+        <div class="heat-cell" style="background:rgba(0,212,170,0.08);border-color:rgba(0,212,170,0.3)"><b>INS</b><span class="up">+0.12%</span></div>
+        <div class="heat-cell" style="background:rgba(0,212,170,0.20);border-color:rgba(0,212,170,0.3)"><b>OIL</b><span class="up">+1.45%</span></div>
+        <div class="heat-cell" style="background:rgba(0,212,170,0.10);border-color:rgba(0,212,170,0.3)"><b>GAS</b><span class="up">+0.34%</span></div>
+        <div class="heat-cell" style="background:rgba(0,212,170,0.35);border-color:rgba(0,212,170,0.3)"><b>URN</b><span class="up">+3.21%</span></div>
+        <div class="heat-cell" style="background:rgba(255,85,85,0.15);border-color:rgba(255,85,85,0.3)"><b>WND</b><span class="down">-0.89%</span></div>
+        <div class="heat-cell" style="background:rgba(0,212,170,0.08);border-color:rgba(0,212,170,0.3)"><b>GRD</b><span class="up">+0.23%</span></div>
+        <div class="heat-cell" style="background:rgba(255,85,85,0.25);border-color:rgba(255,85,85,0.3)"><b>BAT</b><span class="down">-2.11%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Widget 5: NIFTY 15-Min Chart -->
+  <div class="widget" data-type="nifty15">
+    <div class="widget-header">NIFTY 50 — 15 MIN</div>
+    <div class="widget-body" id="w-nifty15">
+      <canvas id="nifty-canvas" width="400" height="180"></canvas>
+    </div>
+  </div>
+
+  <!-- Widget 6: AAPL Chart -->
+  <div class="widget" data-type="aapl">
+    <div class="widget-header">AAPL CHART</div>
+    <div class="widget-body" id="w-aapl">
+      <canvas id="aapl-canvas" width="400" height="180"></canvas>
+    </div>
+  </div>
+
+  <!-- Widget 7: Precious Metals -->
+  <div class="widget" data-type="metals">
+    <div class="widget-header">PRECIOUS METALS</div>
+    <div class="widget-body" id="w-metals">
+      <div class="metal"><div><div class="muted">Gold (XAU)</div><div style="font-size:14px;font-weight:bold">$2,345.60</div><div class="up">+0.34%</div></div></div>
+      <div class="metal"><div><div class="muted">Silver (XAG)</div><div style="font-size:14px;font-weight:bold">$28.45</div><div class="down">-0.56%</div></div></div>
+      <div class="metal"><div><div class="muted">Copper (COP)</div><div style="font-size:14px;font-weight:bold">$4.56</div><div class="up">+0.78%</div></div></div>
+    </div>
+  </div>
+
+  <!-- Widget 8: World Clocks -->
+  <div class="widget" data-type="clocks">
+    <div class="widget-header">WORLD SESSIONS</div>
+    <div class="widget-body" id="w-clocks">
+      <div class="clocks">
+        <div class="clock"><div class="clock-city">Tokyo</div><div class="clock-time" id="clk-tokyo">--:--</div><div class="clock-status closed">CLOSED</div></div>
+        <div class="clock"><div class="clock-city">Mumbai</div><div class="clock-time" id="clk-mumbai">--:--</div><div class="clock-status closed">CLOSED</div></div>
+        <div class="clock"><div class="clock-city">London</div><div class="clock-time" id="clk-london">--:--</div><div class="clock-status closed">CLOSED</div></div>
+        <div class="clock"><div class="clock-city">New York</div><div class="clock-time" id="clk-ny">--:--</div><div class="clock-status closed">CLOSED</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Widget 9: Technical Analysis -->
+  <div class="widget" data-type="ta">
+    <div class="widget-header">TECHNICAL ANALYSIS</div>
+    <div class="widget-body" id="w-ta">
+      <div style="text-align:center;padding:10px">
+        <div style="font-size:9px;color:var(--dim)">15-MIN BIAS</div>
+        <div style="font-size:18px;font-weight:bold;color:var(--yellow)">NEUTRAL</div>
+        <div style="font-size:9px;color:var(--dim)">Conf: 0%</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px">
+        <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:3px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--dim)">RSI (14)</div><div style="font-size:18px;font-weight:bold">50.0</div><div class="muted">NEUTRAL</div></div>
+        <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:3px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--dim)">MACD</div><div style="font-size:18px;font-weight:bold;color:var(--green)">+0.00</div><div class="up">BULLISH</div></div>
+      </div>
+      <div style="margin-top:6px;padding:6px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:3px">
+        <div style="font-size:9px;color:var(--dim)">SIGNALS</div>
+        <div style="font-size:10px;padding:1px 0">• Demo mode — no live data</div>
+      </div>
+      <div style="margin-top:6px;padding:8px;background:rgba(0,0,0,0.2);border:1px solid var(--border);border-radius:3px;text-align:center">
+        <div style="font-size:9px;color:var(--dim)">NEXT 15-MIN PREDICTION</div>
+        <div style="font-size:14px;font-weight:bold;color:var(--yellow)">NEUTRAL</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="tooltip"></div>
+
+<script>
+// ===================== CLOCKS =====================
+function updateClocks(){
+  const markets=[{id:'clk-tokyo',tz:'Asia/Tokyo',o:9,c:15},{id:'clk-mumbai',tz:'Asia/Kolkata',o:9,c:15.5},{id:'clk-london',tz:'Europe/London',o:8,c:16.5},{id:'clk-ny',tz:'America/New_York',o:9.5,c:16}];
+  markets.forEach(m=>{
+    const now=new Date();
+    const timeStr=now.toLocaleTimeString('en-US',{timeZone:m.tz,hour12:false,hour:'2-digit',minute:'2-digit'});
+    const hr=parseInt(now.toLocaleTimeString('en-US',{timeZone:m.tz,hour12:false,hour:'numeric'}));
+    const mn=parseInt(now.toLocaleTimeString('en-US',{timeZone:m.tz,hour12:false,minute:'numeric'}));
+    const dt=hr+mn/60;
+    let st='closed',txt='CLOSED';
+    if(dt>=m.o&&dt<m.c){st='open';txt='OPEN'}else if(Math.abs(dt-m.o)<0.5){st='pre';txt='PRE-OPEN'}
+    const el=document.getElementById(m.id);
+    if(el){el.textContent=timeStr;el.nextElementSibling.className='clock-status '+st;el.nextElementSibling.textContent=txt}
+  });
+}
+setInterval(updateClocks,1000);updateClocks();
+
+// ===================== HEADER CLOCK =====================
+setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-IN',{hour12:false})},1000);
+
+// ===================== NIFTY CANVAS =====================
+function drawNifty(){
+  const c=document.getElementById('nifty-canvas');if(!c)return;
+  const ctx=c.getContext('2d'),w=c.width,h=c.height;
+  ctx.fillStyle='#111118';ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='rgba(31,31,46,0.6)';ctx.lineWidth=0.5;
+  for(let i=0;i<=4;i++){let y=20+(h-40)/4*i;ctx.beginPath();ctx.moveTo(30,y);ctx.lineTo(w-50,y);ctx.stroke();ctx.fillStyle='#6e7681';ctx.font='8px monospace';ctx.textAlign='right';ctx.fillText((22550-(i*50)).toFixed(0),w-5,y+3)}
+  let p=22500;const bw=5;
+  for(let i=0;i<40;i++){
+    let o=p,c=p+(Math.random()-0.48)*30,hg=Math.max(o,c)+Math.random()*15,l=Math.min(o,c)-Math.random()*15,up=c>=o;
+    ctx.strokeStyle=up?'#00d4aa':'#ff5555';ctx.fillStyle=up?'#00d4aa':'#ff5555';
+    ctx.beginPath();ctx.moveTo(35+i*bw+2,20+(22550-hg)/200*(h-40));ctx.lineTo(35+i*bw+2,20+(22550-l)/200*(h-40));ctx.stroke();
+    ctx.fillRect(35+i*bw,20+(22550-Math.max(o,c))/200*(h-40),4,Math.max(Math.abs((c-o)/200*(h-40)),1));p=c;
+  }
+  ctx.fillStyle='#00d4aa';ctx.font='bold 10px monospace';ctx.fillText('NIFTY 50 — 15 Min Demo',8,14);
+  ctx.fillStyle='#6e7681';ctx.font='8px monospace';ctx.fillText('Base: 22,534 | Demo Data',8,24);
+}
+drawNifty();
+
+// ===================== AAPL CANVAS =====================
+function drawAAPL(){
+  const c=document.getElementById('aapl-canvas');if(!c)return;
+  const ctx=c.getContext('2d'),w=c.width,h=c.height;
+  ctx.fillStyle='#111118';ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='rgba(31,31,46,0.6)';ctx.lineWidth=0.5;
+  for(let i=0;i<=4;i++){let y=20+(h-40)/4*i;ctx.beginPath();ctx.moveTo(30,y);ctx.lineTo(w-50,y);ctx.stroke();ctx.fillStyle='#6e7681';ctx.font='8px monospace';ctx.textAlign='right';ctx.fillText('$'+(180-(i*5)).toFixed(0),w-5,y+3)}
+  let p=175;const bw=5;
+  for(let i=0;i<40;i++){
+    let o=p,c=p+(Math.random()-0.48)*4,hg=Math.max(o,c)+Math.random()*2,l=Math.min(o,c)-Math.random()*2,up=c>=o;
+    ctx.strokeStyle=up?'#00d4aa':'#ff5555';ctx.fillStyle=up?'#00d4aa':'#ff5555';
+    ctx.beginPath();ctx.moveTo(35+i*bw+2,20+(180-hg)/20*(h-40));ctx.lineTo(35+i*bw+2,20+(180-l)/20*(h-40));ctx.stroke();
+    ctx.fillRect(35+i*bw,20+(180-Math.max(o,c))/20*(h-40),4,Math.max(Math.abs((c-o)/20*(h-40)),1));p=c;
+  }
+  ctx.fillStyle='#00d4aa';ctx.font='bold 10px monospace';ctx.fillText('AAPL — 60 Sessions',8,14);
+  ctx.fillStyle='#6e7681';ctx.font='8px monospace';ctx.fillText('Demo Data',8,24);
+}
+drawAAPL();
+
+// ===================== SEARCH & FILTER =====================
+function filterWidgets(term){
+  term=(term||'').toLowerCase().trim();
+  document.querySelectorAll('.widget').forEach(w=>{
+    const txt=w.textContent.toLowerCase(),type=w.getAttribute('data-type')||'';
+    const isNifty=type.includes('nifty')||type.includes('ta')||type.includes('indices')||txt.includes('nifty');
+    const match=!term||txt.includes(term)||type.includes(term)||(term==='nifty'&&isNifty);
+    w.style.display=term&&!match?'none':'flex';
+  });
+  const b=document.getElementById('sentiment');
+  if(term.includes('nifty')){b.style.borderBottom='1px solid #00d4aa';b.style.boxShadow='0 0 15px rgba(0,212,170,0.15)'}
+  else{b.style.borderBottom='1px solid var(--border)';b.style.boxShadow='none'}
+}
+
+function toggleNifty(){
+  const btn=document.getElementById('nifty-btn'),sb=document.getElementById('search-box');
+  const on=btn.classList.toggle('active');
+  if(on){sb.value='nifty';filterWidgets('nifty');btn.style.background='rgba(0,212,170,0.15)';btn.style.borderColor='var(--green)'}
+  else{sb.value='';filterWidgets('');btn.style.background='#0a0a0f';btn.style.borderColor='var(--border)'}
+}
+
+function resetLayout(){
+  document.querySelectorAll('.widget').forEach(w=>w.style.display='flex');
+  document.getElementById('search-box').value='';
+  const btn=document.getElementById('nifty-btn');btn.classList.remove('active');btn.style.background='#0a0a0f';btn.style.borderColor='var(--border)';
+}
+
+function toggleAddMenu(){
+  alert('Add Widget: Use the 9 pre-built widgets in the HTML. Edit index.html to add more.');
+}
+
+// Hide loading
+document.getElementById('loading').classList.add('hidden');
+</script>
+</body>
+</html>
